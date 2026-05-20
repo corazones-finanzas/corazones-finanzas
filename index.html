@@ -738,21 +738,21 @@ const avColor = n => AVC[Math.abs([...String(n)].reduce((h,c)=>h*31+c.charCodeAt
 const initials = n => (n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
 const ICOS = [
   // Infraestructura
-  '🏭','🏠','🏗️','🏪','🔑','🪟','🚪',
+  '🏭','🏠','🏗','🏪','🔑','🪟','🚪',
   // Servicios
-  '💡','⚡','💧','📶','📡','🔌','☎️','📱',
+  '💡','⚡','💧','📶','📡','🔌','☎','📱',
   // Personal
   '👷','👤','👥','🧑‍💼','👨‍💻','🤝',
   // Operativo / Impresión
-  '🖨️','🖥️','📷','🎨','✂️','🖊️','📐','📏',
+  '🖨','🖥','📷','🎨','✂','🖊','📐','📏',
   // Materiales
-  '🧱','🪣','🪚','🔧','🔨','⚙️','📦','🗜️',
+  '🧱','🪣','🪚','🔧','🔨','⚙','📦','🗜',
   // Finanzas
   '💼','💰','📊','📋','📄','🧾','💳','🏦',
   // Hogar / Casa
-  '🛒','🍽️','📚','🏥','🚗','🚌','🎓','🧸',
+  '🛒','🍽','📚','🏥','🚗','🚌','🎓','🧸',
   // Varios
-  '🎯','🔥','⭐','🌟','🏆','📌','🗂️','🎁',
+  '🎯','🔥','⭐','🌟','🏆','📌','🗂','🎁',
 ];
 const ICO_CATS = [
   {lbl:'Infraestructura', range:[0,7]},
@@ -764,7 +764,7 @@ const ICO_CATS = [
   {lbl:'Hogar / Casa', range:[45,53]},
   {lbl:'Varios', range:[53,61]},
 ];
-const BG_MAP={'🏭':'#FEF2F2','💡':'#FEF9C3','📶':'#EFF6FF','👷':'#F5F3FF','🖨️':'#FFF7ED','🏠':'#F0FDF4','🛒':'#FEF9C3','📚':'#EFF6FF','💧':'#F5F3FF','🏥':'#FEF2F2','🚗':'#FFF7ED','📦':'#EFF6FF','🔧':'#F3F4F6','📱':'#EFF6FF','💼':'#F5F3FF','🎯':'#FEF2F2','⚡':'#FEF9C3','🔌':'#FEF9C3','🧱':'#EFF6FF','🪣':'#EFF6FF','🪚':'#F5F3FF','🖥️':'#EFF6FF','📷':'#F5F3FF','🎨':'#F5F3FF'};
+const BG_MAP={'🏭':'#FEF2F2','💡':'#FEF9C3','📶':'#EFF6FF','👷':'#F5F3FF','🖨':'#FFF7ED','🏠':'#F0FDF4','🛒':'#FEF9C3','📚':'#EFF6FF','💧':'#F5F3FF','🏥':'#FEF2F2','🚗':'#FFF7ED','📦':'#EFF6FF','🔧':'#F3F4F6','📱':'#EFF6FF','💼':'#F5F3FF','🎯':'#FEF2F2','⚡':'#FEF9C3','🔌':'#FEF9C3','🧱':'#EFF6FF','🪣':'#EFF6FF','🪚':'#F5F3FF','🖥':'#EFF6FF','📷':'#F5F3FF','🎨':'#F5F3FF'};
 
 function toast(msg){const el=G('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200)}
 
@@ -783,7 +783,7 @@ const DOC = fdb.collection('corazones').doc('datos');
 
 let syncTimer = null;
 
-function showSync(icon){ const el=G('sync-icon'); if(el){el.textContent=icon; setTimeout(()=>{if(el.textContent===icon)el.textContent='☁️'},3000)} }
+function showSync(icon){ const el=G('sync-icon'); if(el){el.textContent=icon; setTimeout(()=>{if(el.textContent===icon)el.textContent='☁'},3000)} }
 
 function save(){
   localStorage.setItem('crzApp', JSON.stringify(db));
@@ -792,7 +792,7 @@ function save(){
     try{
       await DOC.set(JSON.parse(JSON.stringify(db)));
       showSync('✅');
-    }catch(e){ showSync('⚠️'); }
+    }catch(e){ showSync('⚠'); }
   }, 1500);
 }
 
@@ -842,7 +842,7 @@ const db = {
     {id:3,nombre:'Deudas',cat:'Finanzas',monto:3000000,ico:'💳',bg:'#F5F3FF',bar:'#7C3AED'},
     {id:4,nombre:'Contador',cat:'Finanzas',monto:120000,ico:'📊',bg:'#F5F3FF',bar:'#7C3AED'},
     {id:5,nombre:'Internet',cat:'Comunicación',monto:100000,ico:'📶',bg:'#EFF6FF',bar:'#2563EB'},
-    {id:6,nombre:'Dx5',cat:'Operativo',monto:500000,ico:'🖨️',bg:'#FFF7ED',bar:'#EA580C'},
+    {id:6,nombre:'Dx5',cat:'Operativo',monto:500000,ico:'🖨',bg:'#FFF7ED',bar:'#EA580C'},
     {id:7,nombre:'Herramientas',cat:'Operativo',monto:500000,ico:'🔧',bg:'#F3F4F6',bar:'#6B7280'},
   ],
   gastosCas:[
@@ -1467,7 +1467,7 @@ function openModal(t, prefill){
   let h='<div class="m-handle"></div>';
 
   if(t==='ingreso'){
-    h+=`<div class="m-title">${isEdit?'✏️ Editar ingreso':'💰 Nuevo ingreso'}</div>
+    h+=`<div class="m-title">${isEdit?'✏ Editar ingreso':'💰 Nuevo ingreso'}</div>
       <div class="field"><div class="fl">Descripción</div><input class="inp" id="f-desc" type="text" placeholder="Ej: Gigantografía 3x2m" value="${esc(prefill?.desc||'')}"></div>
       <div class="field"><div class="fl">Cliente</div><select class="sel" id="f-cl"><option value="">Sin asignar</option>${db.clientes.map(c=>`<option value="${esc(c.nombre)}"${prefill?.cliente===c.nombre?' selected':''}>${esc(c.nombre)}</option>`).join('')}</select></div>
       <div class="field"><div class="fl">Monto (₲)</div><input class="inp" id="f-monto" type="number" inputmode="numeric" placeholder="0" value="${prefill?.monto||''}"></div>
@@ -1477,7 +1477,7 @@ function openModal(t, prefill){
 
   } else if(t==='gasto-emp'||t==='gasto-cas'){
     const cats=t==='gasto-emp'?CAT_EMP:CAT_CAS;
-    h+=`<div class="m-title">${isEdit?'✏️ Editar gasto fijo':t==='gasto-emp'?'🏢 Gasto fijo empresa':'🏠 Gasto fijo casa'}</div>
+    h+=`<div class="m-title">${isEdit?'✏ Editar gasto fijo':t==='gasto-emp'?'🏢 Gasto fijo empresa':'🏠 Gasto fijo casa'}</div>
       <div class="field"><div class="fl">Nombre del gasto</div><input class="inp" id="f-desc" type="text" placeholder="Ej: Alquiler local" value="${esc(prefill?.nombre||'')}"></div>
       <div class="field"><div class="fl">Categoría</div><select class="sel" id="f-cat">${cats.map(c=>`<option${prefill?.cat===c?' selected':''}>${c}</option>`).join('')}</select></div>
       <div class="field"><div class="fl">Ícono</div>${icoGrid(selIco)}</div>
@@ -1486,7 +1486,7 @@ function openModal(t, prefill){
       <button class="btn-cancel2" onclick="closeModal()">Cancelar</button>`;
 
   } else if(t==='proveedor'){
-    h+=`<div class="m-title">${isEdit?'✏️ Editar pago':'🏭 Pago a proveedor'}</div>
+    h+=`<div class="m-title">${isEdit?'✏ Editar pago':'🏭 Pago a proveedor'}</div>
       <div class="field"><div class="fl">Descripción / producto</div><input class="inp" id="f-desc" type="text" placeholder="Ej: Lona frontlit 50m" value="${esc(prefill?.desc||'')}"></div>
       <div class="field"><div class="fl">Proveedor</div><input class="inp" id="f-prov" type="text" placeholder="Ej: Proveedor Alfa" value="${esc(prefill?.proveedor||'')}"></div>
       <div class="field"><div class="fl">Monto (₲)</div><input class="inp" id="f-monto" type="number" inputmode="numeric" placeholder="0" value="${prefill?.monto||''}"></div>
@@ -1495,7 +1495,7 @@ function openModal(t, prefill){
       <button class="btn-cancel2" onclick="closeModal()">Cancelar</button>`;
 
   } else if(t==='material'){
-    h+=`<div class="m-title">${isEdit?'✏️ Editar compra':'🧱 Compra de material'}</div>
+    h+=`<div class="m-title">${isEdit?'✏ Editar compra':'🧱 Compra de material'}</div>
       <div class="field"><div class="fl">Descripción</div><input class="inp" id="f-desc" type="text" placeholder="Ej: Vinilo de corte blanco 20m" value="${esc(prefill?.desc||'')}"></div>
       <div class="field"><div class="fl">Categoría</div><select class="sel" id="f-cat">${CAT_MAT.map(c=>`<option${prefill?.cat===c?' selected':''}>${c}</option>`).join('')}</select></div>
       <div class="field"><div class="fl">Monto (₲)</div><input class="inp" id="f-monto" type="number" inputmode="numeric" placeholder="0" value="${prefill?.monto||''}"></div>
@@ -1548,7 +1548,7 @@ function openModal(t, prefill){
     h+=`<input type="hidden" id="f-ctx" value="${ctx}">`;
 
   } else if(t==='cliente'){
-    h+=`<div class="m-title">${isEdit?'✏️ Editar cliente':'👤 Nuevo cliente'}</div>
+    h+=`<div class="m-title">${isEdit?'✏ Editar cliente':'👤 Nuevo cliente'}</div>
       <div class="field"><div class="fl">Nombre / Empresa</div><input class="inp" id="f-desc" type="text" placeholder="Ej: ABC Corp" value="${esc(prefill?.nombre||'')}"></div>
       <div class="field"><div class="fl">Teléfono</div><input class="inp" id="f-tel" type="tel" placeholder="+595 981 000000" value="${esc(prefill?.tel||'')}"></div>
       <div class="field"><div class="fl">RUC (opcional)</div><input class="inp" id="f-ruc" type="text" placeholder="80012345-1" value="${esc(prefill?.ruc||'')}"></div>
@@ -1557,7 +1557,7 @@ function openModal(t, prefill){
 
   } else if(t==='pedido'){
     const cl=db.clientes.find(c=>c.id===actCl);
-    h+=`<div class="m-title">${isEdit?'✏️ Editar pedido':'📋 Nuevo pedido'}${cl&&!isEdit?' — '+esc(cl.nombre):''}</div>
+    h+=`<div class="m-title">${isEdit?'✏ Editar pedido':'📋 Nuevo pedido'}${cl&&!isEdit?' — '+esc(cl.nombre):''}</div>
       <div class="field"><div class="fl">Descripción del trabajo</div><input class="inp" id="f-desc" type="text" placeholder="Ej: Gigantografía 4x3m" value="${esc(prefill?.desc||'')}"></div>
       <div class="field"><div class="fl">Detalle / material</div><input class="inp" id="f-det" type="text" placeholder="Ej: Lona frontlit, instalación" value="${esc(prefill?.det||'')}"></div>
       <div class="field"><div class="fl">Monto (₲)</div><input class="inp" id="f-monto" type="number" inputmode="numeric" placeholder="0" value="${prefill?.monto||''}"></div>
@@ -1734,7 +1734,7 @@ async function registrarHuella(){
 
 async function loginConHuella(){
   const idB64 = localStorage.getItem(BIO_KEY);
-  if(!idB64){ toast('⚠️ Primero ingresá con contraseña'); return; }
+  if(!idB64){ toast('⚠ Primero ingresá con contraseña'); return; }
   try{
     const rawId = Uint8Array.from(atob(idB64), c=>c.charCodeAt(0));
     const chal  = crypto.getRandomValues(new Uint8Array(32));
@@ -1751,7 +1751,7 @@ async function loginConHuella(){
       setTimeout(()=>ls.remove(), 500);
     }
   }catch(e){
-    if(e.name!=='NotAllowedError') toast('⚠️ No se pudo verificar la huella');
+    if(e.name!=='NotAllowedError') toast('⚠ No se pudo verificar la huella');
   }
 }
 
@@ -1764,7 +1764,7 @@ async function ofrecerHuella(){
   if(!si) return;
   const ok = await registrarHuella();
   if(ok) toast('✅ ¡Huella activada! La próxima vez entrás con el dedo 👆');
-  else    toast('⚠️ No se pudo activar la huella');
+  else    toast('⚠ No se pudo activar la huella');
 }
 
 // ── SPLASH + LOGIN ─────────────────────────────────────────
@@ -1855,10 +1855,15 @@ document.addEventListener('keydown', e=>{
 });
 
 // ── INIT ──────────────────────────────────────────────────
-(async ()=>{
-  await load();    // espera que bajen datos de Firebase
-  rInicio();       // re-renderiza con datos frescos
-})();
+// Cargar local inmediatamente
+try{
+  const d=localStorage.getItem('crzApp');
+  if(d){const p=JSON.parse(d);if(p&&p._v===3)Object.keys(p).forEach(k=>{if(db[k]!==undefined)db[k]=p[k]});}
+}catch(e){}
+// Firebase en background
+setTimeout(async()=>{
+  try{ await load(); rInicio(); }catch(e){ console.warn('Firebase:',e); }
+},200);
 
 if(sessionStorage.getItem('crzLoggedIn')==='1'){
   runSplashNoLogin();
