@@ -658,27 +658,31 @@ body{font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;back
 
   <!-- ⑤ CLIENTES -->
   <div id="scr-clientes" class="scr">
-    <div class="sec-ttl">Clientes</div>
-    <div class="sec-sub" id="cl-sub">Panel de clientes y pedidos</div>
-    <div class="stat2">
-      <div class="scard" style="cursor:default">
-        <div class="sc-ico" style="background:#FEF3C7">🧾</div>
-        <div class="sc-val" id="cl-pend" style="color:var(--orange)">₲ 0</div>
-        <div class="sc-lbl">Por cobrar</div>
+    <!-- Header con buscador + botón nuevo -->
+    <div style="padding:14px 16px 0;display:flex;gap:10px;align-items:center">
+      <div style="flex:1;position:relative">
+        <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%)" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="cl-search" type="text" placeholder="Buscar cliente..."
+          oninput="clSearch=this.value;rClientes()"
+          style="width:100%;padding:11px 14px 11px 36px;border-radius:12px;border:1.5px solid var(--border);font-size:14px;font-family:inherit;color:var(--txt);background:#fff;outline:none;box-sizing:border-box">
       </div>
-      <div class="scard" style="cursor:default">
-        <div class="sc-ico" style="background:var(--green-bg)">✅</div>
-        <div class="sc-val" id="cl-cobr" style="color:var(--green)">₲ 0</div>
-        <div class="sc-lbl">Cobrado</div>
+      <button onclick="openModal('cliente')" style="background:var(--red);color:#fff;border:none;border-radius:12px;padding:11px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;box-shadow:0 4px 12px rgba(204,32,32,.3)">+ Nuevo</button>
+    </div>
+
+    <!-- Stats por cobrar / cobrado -->
+    <div style="display:flex;gap:8px;padding:10px 16px 0">
+      <div style="flex:1;background:#FFF7ED;border-radius:12px;padding:10px 12px">
+        <div style="font-size:10px;color:var(--orange);font-weight:700;text-transform:uppercase;letter-spacing:.05em">Por cobrar</div>
+        <div style="font-size:16px;font-weight:800;color:var(--orange);margin-top:2px" id="cl-pend">₲ 0</div>
+      </div>
+      <div style="flex:1;background:var(--green-bg);border-radius:12px;padding:10px 12px">
+        <div style="font-size:10px;color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:.05em">Cobrado</div>
+        <div style="font-size:16px;font-weight:800;color:var(--green);margin-top:2px" id="cl-cobr">₲ 0</div>
       </div>
     </div>
-    <div class="pad" style="margin-top:10px">
-      <div class="card">
-        <div class="chd">Lista de clientes</div>
-        <div id="cl-list"></div>
-        <button class="add-row" onclick="openModal('cliente')"><span style="font-size:18px">+</span> Nuevo cliente</button>
-      </div>
-    </div>
+
+    <!-- Lista de clientes -->
+    <div style="padding:10px 16px 0;display:flex;flex-direction:column;gap:10px" id="cl-list"></div>
     <div style="height:16px"></div>
   </div>
 
@@ -985,6 +989,7 @@ function navigate(scr, clId){
     scr==='det'?'pedido':'ingreso'
   );
   G('content').scrollTop=0;
+  if(scr==='clientes'){ clSearch=''; setTimeout(()=>{const si=G('cl-search');if(si)si.value='';},50); }
   render(scr);
 }
 
@@ -1243,22 +1248,54 @@ function rRetiros(){
       </div>`;
   }).filter(Boolean).join('') || '<div style="font-size:12px;color:var(--muted);padding:8px 0">Registrá retiros para ver el progreso</div>';
 }
+let clSearch = '';
+
 function rClientes(){
   const allP=db.pedidos.filter(p=>p.estado!=='done').reduce((a,p)=>a+p.monto,0);
   const allC=db.pedidos.filter(p=>p.estado==='done').reduce((a,p)=>a+p.monto,0);
   G('cl-pend').textContent=fmt(allP);
   G('cl-cobr').textContent=fmt(allC);
-  G('cl-sub').textContent=`${db.clientes.length} clientes · ${db.pedidos.length} pedidos`;
-  G('cl-list').innerHTML = db.clientes.length ? db.clientes.map(cl=>{
-    const p=db.pedidos.filter(x=>x.clId===cl.id);
-    const pm=p.filter(x=>x.estado!=='done').reduce((a,x)=>a+x.monto,0);
-    return `<div class="cli" onclick="navigate('det',${cl.id})">
-      <div class="cl-av" style="background:${avColor(cl.nombre)}">${initials(cl.nombre)}</div>
-      <div class="cl-info"><div class="cl-name">${esc(cl.nombre)}</div><div class="cl-det">${p.length} pedido${p.length!==1?'s':''} · ${esc(cl.tel||'')}</div></div>
-      <div class="cl-right"><div class="cl-total">${fmt(pm)}</div><span class="badge ${pm>0?'pend':'ok'}">${pm>0?'por cobrar':'al día'}</span></div>
+
+  const q = clSearch.toLowerCase();
+  const filtered = db.clientes.filter(cl=>
+    cl.nombre.toLowerCase().includes(q) ||
+    (cl.tel||'').includes(q) ||
+    (cl.ruc||'').toLowerCase().includes(q)
+  );
+
+  G('cl-list').innerHTML = filtered.length ? filtered.map(cl=>{
+    const peds = db.pedidos.filter(x=>x.clId===cl.id);
+    const total = peds.reduce((a,p)=>a+p.monto,0);
+    const pendMonto = peds.filter(p=>p.estado!=='done').reduce((a,p)=>a+p.monto,0);
+    const pendCnt = peds.filter(p=>p.estado==='pend').length;
+    const progCnt = peds.filter(p=>p.estado==='prog').length;
+    return `
+    <div class="card" onclick="navigate('det',${cl.id})" style="cursor:pointer;active:opacity:.85">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div class="cl-av" style="background:${avColor(cl.nombre)};width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0">${initials(cl.nombre)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:800;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(cl.nombre)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">RUC: ${esc(cl.ruc||'—')}</div>
+        </div>
+        ${pendMonto>0?`<span style="font-size:10px;padding:3px 8px;border-radius:20px;background:#FEF3C7;color:#92400E;font-weight:700">por cobrar</span>`:`<span style="font-size:10px;padding:3px 8px;border-radius:20px;background:var(--green-bg);color:#14532D;font-weight:700">al día</span>`}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div style="background:var(--border2);border-radius:10px;padding:8px;text-align:center">
+          <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Teléfono</div>
+          <div style="font-size:12px;font-weight:700;color:var(--txt);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(cl.tel||'—')}</div>
+        </div>
+        <div style="background:var(--border2);border-radius:10px;padding:8px;text-align:center">
+          <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Pedidos</div>
+          <div style="font-size:12px;font-weight:700;color:var(--txt);margin-top:3px">${peds.length}${pendCnt>0?` <span style="color:var(--orange)">(${pendCnt}✓)</span>`:''}</div>
+        </div>
+        <div style="background:var(--border2);border-radius:10px;padding:8px;text-align:center">
+          <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Total</div>
+          <div style="font-size:11px;font-weight:800;color:${pendMonto>0?'var(--orange)':'var(--green)'};margin-top:3px">${fmt(pendMonto>0?pendMonto:total)}</div>
+        </div>
+      </div>
     </div>`;
   }).join('') :
-    '<div class="empty"><div class="ei">👥</div><div class="et">Sin clientes</div><div class="es">Tocá + para agregar</div></div>';
+  `<div class="empty"><div class="ei">👥</div><div class="et">${clSearch?'Sin resultados':'Sin clientes'}</div><div class="es">${clSearch?'Intentá con otro nombre':'Tocá + Nuevo para agregar'}</div></div>`;
 }
 
 // ─── DETALLE CLIENTE ───
